@@ -1,0 +1,29 @@
+
+
+services:
+
+  # api: The main container
+    # ========================
+  api:
+    image: ghcr.io/jackkweyunga/docker-gh-tutorial:master
+    restart: always
+    ports:
+      - 8000:9000
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+
+  # watchtower: For auto-updating the container
+  # ============================================
+  watchtower:
+    container_name: "watchtower"
+    image: "docker.io/containrrr/watchtower"
+    volumes:
+      # Mount the Docker socket so that Watchtower can update the container
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Mount the Docker config file so that Watchtower can authenticate with the registry
+      - /root/.docker/config.json:/config.json:ro
+    restart: always
+    environment:
+      TZ: Africa/Dar_es_Salaam
+      WATCHTOWER_LIFECYCLE_HOOKS: "1" # Enable pre/post-update scripts
+    command: --debug --cleanup --interval 30
